@@ -1,6 +1,8 @@
 # Claude Code Memory Base
 
-This is Hermes's memory base for Claude Code. Use wiki-links to navigate.
+> **Repo:** https://github.com/Zicross/hermes-memory
+
+Shared context for Claude Code (Opus → Gemma) across laptop and host machines. Hermes maintains this.
 
 ## Structure
 
