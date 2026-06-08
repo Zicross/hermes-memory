@@ -67,9 +67,13 @@ curl -sS http://127.0.0.1:8899/version
 ss -ltnp '( sport = :8888 or sport = :8899 )'
 ```
 
-## Watchdog
+## Watchdog and audit cron
 
-A silent script-only cron watchdog was added after deployment:
+Two cron layers now exist:
+
+### 1. Silent health watchdog
+
+A silent script-only cron watchdog checks basic Hindsight availability:
 
 - Script: `~/.hermes/scripts/hindsight-health-watchdog.py`
 - Cron name: `Hindsight memory health watchdog`
@@ -85,6 +89,37 @@ Manual test:
 ```
 
 Expected healthy output: no output.
+
+### 2. Agent-driven memory system audit
+
+A second cron performs the higher-level audit Isaac requested: whether memory is actually working in the system and when to graduate toward Obsidian/internal-memory integration.
+
+- Script: `~/.hermes/scripts/memory-system-audit-context.py`
+- Cron name: `Hermes memory system audit and graduation review`
+- Job id: `0ed72da710af`
+- Schedule: every 24 hours
+- Delivery: origin chat
+- Attached skills: `hermes-memory-operations`, `hindsight-hermes-setup`, `obsidian`
+
+The script collects grounded context only:
+
+- Hindsight service, `/health`, `/version`, listeners, recent warnings
+- Hermes memory provider/status
+- Hindsight plugin config subset: `auto_recall`, `auto_retain`, `retain_async`, bank template
+- REST retain/recall smoke test
+- SYSTEM_BOOT memory pointers
+- shared repo status and memory-system docs
+- Obsidian vault discovery and candidate counts
+- graduation criteria
+
+The cron agent then emits a concise verdict:
+
+- `HOLD` — not healthy enough or source-of-truth hygiene is off
+- `READY_TO_DESIGN_BRIDGE` — Hindsight works; define Obsidian ingestion policy
+- `READY_TO_PROTOTYPE_BRIDGE` — policy is clear; build selected-note ingestion
+- `READY_TO_INDEX_SELECTED_NOTES` — prototype verified; safe to index approved notes
+
+Important: the audit cron is report-only. It must not ingest Obsidian notes or rewrite memory directly.
 
 ## REST retain/recall smoke test
 
