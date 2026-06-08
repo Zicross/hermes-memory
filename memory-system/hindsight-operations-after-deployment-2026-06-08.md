@@ -67,6 +67,25 @@ curl -sS http://127.0.0.1:8899/version
 ss -ltnp '( sport = :8888 or sport = :8899 )'
 ```
 
+## Watchdog
+
+A silent script-only cron watchdog was added after deployment:
+
+- Script: `~/.hermes/scripts/hindsight-health-watchdog.py`
+- Cron name: `Hindsight memory health watchdog`
+- Job id: `1e2ab7582fae`
+- Schedule: every 1 hour
+- Delivery: origin chat
+- Behavior: prints nothing when healthy; if the service or `/health` fails, it sends an alert with remediation commands.
+
+Manual test:
+
+```bash
+~/.hermes/scripts/hindsight-health-watchdog.py
+```
+
+Expected healthy output: no output.
+
 ## REST retain/recall smoke test
 
 ```bash
